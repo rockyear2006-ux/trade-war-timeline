@@ -13,43 +13,46 @@
   <h2>中美贸易战最新进展（自动更新）</h2>
   <div id="timeline" style="height:350px;"></div>
 
-  <script>
-    /* 中文语言包 */
-    const zhLocale = {
-      current: '当前',
-      time: '时间',
-      date: '日期',
-      weekdays: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
-      months: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
-    };
+<script>
+  /* ---------- 中文语言包 ---------- */
+  const zhLocale = {
+    current: '当前',
+    time: '时间',
+    date: '日期',
+    weekdays: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
+    months: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
+  };
 
-    async function load() {
-      const nodes = await fetch("event.json?" + Date.now()).then(r => r.json());
-      const items = nodes.map((n, idx) => ({
-        id: idx,
-        content: n.title,
-        start: n.date,
-        className: n.type
-      }));
+  /* ---------- 加载并绘制 ---------- */
+  async function load() {
+    const nodes = await fetch('event.json?' + Date.now()).then(r => r.json());
+    const items = nodes.map((n, idx) => ({
+      id: idx,
+      content: n.title,
+      start: n.date,
+      className: n.type
+    }));
 
-      // 注册中文语言
-      vis.timeline.locales['zh'] = zhLocale;
+    // 注册中文
+    vis.timeline.locales['zh'] = zhLocale;
 
-      new vis.Timeline(
-        document.getElementById("timeline"),
-        items,
-        {
-          width: "100%",
-          height: "350px",
-          locale: 'zh',          // 关键：指定用中文
-          locales: vis.timeline.locales
-        }
-      );
-    }
+    // 画时间线
+    new vis.Timeline(
+      document.getElementById('timeline'),
+      items,
+      {
+        width: '100%',
+        height: '350px',
+        locale: 'zh',
+        locales: vis.timeline.locales
+      }
+    );
+  }
 
-    load();
-    setInterval(load, 120000); // 每 2 分钟刷新
-  </script>
+  /* ---------- 首次加载 + 定时刷新 ---------- */
+  load();
+  setInterval(load, 120000); // 每 2 分钟
+</script>
 
   <style>
     .red  { background: #ff4d4f; color: #fff; }
