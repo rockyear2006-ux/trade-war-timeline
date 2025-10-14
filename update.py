@@ -1,4 +1,21 @@
 import json, feedparser, datetime, hashlib
+import requests  # ① 新增
+
+# 免费 Hugging Face 公共 API（BART 摘要模型）
+HF_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
+HF_HEADERS = {"Authorization": "Bearer hf_PublicDemoDoNotRateLimit"}  # 公共 token，限速但够用
+
+# ---------- ② 新增：LLM 精简 ----------
+def shorten(text: str) -> str:
+    if len(text) <= 25:               # 短标题直接返回
+        return text
+    try:
+        payload = {"inputs": text, "parameters": {"max_length": 20, "min_length": 8}}
+        r = requests.post(HF_URL, headers=HF_HEADERS, json=payload, timeout=15)
+        r.raise_for_status()
+        return r.json()[0]["summary_text"]
+    except Exception:                 # 网络失败回退
+        return text[:22] + "…"
 
 # 1. 关键词池
 KEYWORDS = ["中美", "关税", "trade war", "Trump", "Biden", "China US", "tariff"]
