@@ -14,16 +14,6 @@
   <div id="timeline" style="height:350px;"></div>
 
 <script>
-  /* ---------- 中文语言包 ---------- */
-  const zhLocale = {
-    current: '当前',
-    time: '时间',
-    date: '日期',
-    weekdays: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
-    months: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
-  };
-
-  /* ---------- 加载并绘制 ---------- */
   async function load() {
     const nodes = await fetch('event.json?' + Date.now()).then(r => r.json());
     const items = nodes.map((n, idx) => ({
@@ -33,26 +23,20 @@
       className: n.type
     }));
 
-    // 注册中文语言包（兼容新版）
-    vis.timeline.locales = vis.timeline.locales || {};
-    vis.timeline.locales['zh'] = zhLocale;
-    
-    // 画时间线
+    // 不再注册中文，直接用英文默认
     new vis.Timeline(
       document.getElementById('timeline'),
       items,
       {
         width: '100%',
-        height: '350px',
-        locale: 'zh',
-        locales: vis.timeline.locales
+        height: '350px'
+        // locale 留空即英文
       }
     );
   }
 
-  /* ---------- 首次加载 + 定时刷新 ---------- */
   load();
-  setInterval(load, 120000); // 每 2 分钟
+  setInterval(load, 120000);
 </script>
 
   <style>
