@@ -5,10 +5,10 @@ KEYWORDS = ["中美", "关税", "trade war", "Trump", "Biden", "China US", "tari
 
 # 2. 数据源
 FEEDS = [
-    "https://rsshub.app/baidu/top",
-    "https://rsshub.app/zhihu/hot",
-    "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
-    "https://feeds.reuters.com/reuters/businessNews"
+    # 官方 2018-2025 骨架
+    "https://news.google.com/rss/search?q=china+tariff+site:ustr.gov+OR+site:mofcom.gov.cn+before:2025-06-01+after:2018-01-01&ceid=US:en&hl=en-US&gl=US",
+    # 当天增量
+    "https://news.google.com/rss/search?q=china+tariff+site:ustr.gov+OR+site:mofcom.gov.cn&ceid=US:en&hl=en-US&gl=US"
 ]
 
 def color_of(title):
@@ -20,20 +20,26 @@ def color_of(title):
 
 def fetch_nodes():
     nodes = []
-    today = datetime.date.today().strftime("%Y-%m-%d")
+    # ① 不再需要 today
     seen = set()
     for url in FEEDS:
         for entry in feedparser.parse(url).entries:
             title = entry.title
             if not any(k in title for k in KEYWORDS):
                 continue
-            # 简单去重：同一天同一标题
-            key = f"{today}|{title}"
+
+            # ② 用 RSS 原文发布日期
+            pub = entry.published_parsed          # struct_time
+            date = datetime.date(pub[0], pub[1], pub[2]).strftime("%Y-%m-%d")
+
+            # ③ 去重键改成「原文日期+标题」
+            key = f"{date}|{title}"
             if key in seen:
                 continue
             seen.add(key)
+
             nodes.append({
-                "date": today,
+                "date": date,                     # 原文日期
                 "title": title,
                 "type": color_of(title),
                 "source": entry.link
