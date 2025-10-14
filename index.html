@@ -6,6 +6,12 @@
   <script src="https://unpkg.com/vis-timeline@latest/standalone/umd/vis-timeline-graph2d.min.js"></script>
   <link href="https://unpkg.com/vis-timeline@latest/styles/vis-timeline-graph2d.min.css" rel="stylesheet">
   <style>
+        /* 修复刻度乱码 */
+    .vis-time-axis .vis-text,
+    .vis-time-axis .vis-major,
+    .vis-time-axis .vis-minor {
+      font-family: Arial, Helvetica, sans-serif !important;
+    }
     body { font-family: Arial, Helvetica, sans-serif; padding: 20px; }
   </style>
 </head>
