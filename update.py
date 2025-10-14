@@ -1,8 +1,7 @@
 import json, feedparser, datetime, hashlib
 
 # 1. 关键词池
-KEYWORDS = ["中美贸易战", "中美关税", "特朗普 关税", "拜登 关税",
-            "加征关税", "取消关税", "贸易谈判", "贸易缓和"]
+KEYWORDS = ["中美", "关税", "trade war", "Trump", "Biden", "China US", "tariff"]
 
 # 2. 数据源
 FEEDS = [
