@@ -16,6 +16,11 @@ async function load(){
   const items = nodes.map((n,idx)=>({
     id:idx, content:n.title, start:n.date, className:n.type
   }));
+  vis.timeline.locales['zh'] = {
+  current: '当前',
+  time: '时间',
+  date: '日期',
+  weekdays: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
   new vis.Timeline(document.getElementById("timeline"), items, {width:"100%",height:"350px"});
 }
 load();
