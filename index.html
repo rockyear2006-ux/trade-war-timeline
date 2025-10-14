@@ -35,8 +35,19 @@
       items,
       {
         width: '100%',
-        height: '350px'
-        // locale 留空即英文
+        height: '350px',
+        locale: 'en',                       // 英文 locale
+        zoomMin: 1000 * 60 * 60,            // 最小 1 小时
+        zoomMax: 1000 * 60 * 60 * 24 * 365, // 最大 1 年
+        timeAxis: { scale: 'hour', step: 1 }, // 刻度最小单位：小时
+        format: {
+          minorLabels: {
+            hour: 'HH:mm'   // 09:30
+          },
+          majorLabels: {
+            hour: 'ddd D MMM' // Mon 13 Jun
+          }
+        }
       }
     );
   }
