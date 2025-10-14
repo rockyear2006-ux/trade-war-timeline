@@ -33,9 +33,10 @@
       className: n.type
     }));
 
-    // 注册中文
+    // 注册中文语言包（兼容新版）
+    vis.timeline.locales = vis.timeline.locales || {};
     vis.timeline.locales['zh'] = zhLocale;
-
+    
     // 画时间线
     new vis.Timeline(
       document.getElementById('timeline'),
