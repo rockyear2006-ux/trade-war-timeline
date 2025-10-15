@@ -76,3 +76,12 @@ def merge():
 
 if __name__ == "__main__":
     merge()
+    # 调试：看看抓到了多少条
+        try:
+            with open("event.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+            print(f"✅ 当前 event.json 共有 {len(data)} 条节点")
+            for n in data[-3:]:  # 显示最后 3 条
+                print(f"- {n['date']} | {n['title']}")
+        except FileNotFoundError:
+            print("❌ event.json 不存在，可能是没抓到任何节点")
