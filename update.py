@@ -1,30 +1,28 @@
-import json, feedparser, datetime, hashlib
-import requests  # ① 新增
+import json, feedparser, datetime, hashlib, requests
 
-# 免费 Hugging Face 公共 API（BART 摘要模型）
+print("【脚本开始】")
+
 HF_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
-HF_HEADERS = {"Authorization": "Bearer hf_PublicDemoDoNotRateLimit"}  # 公共 token，限速但够用
+HF_HEADERS = {"Authorization": "Bearer hf_PublicDemoDoNotRateLimit"}
 
-# ---------- ② 新增：LLM 精简 ----------
 def shorten(text: str) -> str:
-    if len(text) <= 25:               # 短标题直接返回
+    print("【进入 shorten】", text)
+    if len(text) <= 25:
         return text
     try:
         payload = {"inputs": text, "parameters": {"max_length": 20, "min_length": 8}}
         r = requests.post(HF_URL, headers=HF_HEADERS, json=payload, timeout=15)
         r.raise_for_status()
-        return r.json()[0]["summary_text"]
-    except Exception:                 # 网络失败回退
+        out = r.json()[0]["summary_text"]
+        print("【LLM 返回】", out)
+        return out
+    except Exception as e:
+        print("【LLM 失败】", e)
         return text[:22] + "…"
 
-# 1. 关键词池
 KEYWORDS = ["中美", "关税", "trade war", "Trump", "Biden", "China US", "tariff"]
-
-# 2. 数据源
 FEEDS = [
-    # 官方 2018-2025 骨架
     "https://news.google.com/rss/search?q=china+tariff+site:ustr.gov+OR+site:mofcom.gov.cn+before:2025-06-01+after:2018-01-01&ceid=US:en&hl=en-US&gl=US",
-    # 当天增量
     "https://news.google.com/rss/search?q=china+tariff+site:ustr.gov+OR+site:mofcom.gov.cn&ceid=US:en&hl=en-US&gl=US"
 ]
 
@@ -37,27 +35,24 @@ def color_of(title):
 
 def fetch_nodes():
     nodes = []
-    # ① 不再需要 today
     seen = set()
     for url in FEEDS:
-        for entry in feedparser.parse(url).entries:
+        feed = feedparser.parse(url)
+        print("【抓取】", url, "条目数", len(feed.entries))
+        for entry in feed.entries:
             title = entry.title
             if not any(k in title for k in KEYWORDS):
                 continue
-
-            # ② 用 RSS 原文发布日期
-            pub = entry.published_parsed          # struct_time
+            pub = entry.published_parsed
             date = datetime.date(pub[0], pub[1], pub[2]).strftime("%Y-%m-%d")
-
-            # ③ 去重键改成「原文日期+标题」
-            key = f"{date}|{title}"
+            short_title = shorten(title)
+            key = f"{date}|{short_title}"
             if key in seen:
                 continue
             seen.add(key)
-
             nodes.append({
-                "date": date,                     # 原文日期
-                "title": title,
+                "date": date,
+                "title": short_title,
                 "type": color_of(title),
                 "source": entry.link
             })
@@ -69,7 +64,6 @@ def merge():
     except:
         old = []
     new = fetch_nodes()
-    # 合并+去重
     merged = {(n["date"], n["title"]): n for n in old + new}.values()
     merged = sorted(merged, key=lambda x: x["date"])
     json.dump(merged, open("event.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
